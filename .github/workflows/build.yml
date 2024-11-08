@@ -60,14 +60,21 @@ jobs:
           sdkmanager --update
           sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
+        
+          sdkmanager --uninstall "build-tools;35.0.0"
+          rm -rf $ANDROID_SDK_ROOT/build-tools/35.0.0
+
       - name: Build the APK
         run: |
           source venv/bin/activate
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+          
+        
           sed -i 's/android.api = .*/android.api = 30/' buildozer.spec
           sed -i 's/android.minapi = .*/android.minapi = 21/' buildozer.spec
           sed -i 's/android.sdk = .*/android.sdk = 30.0.3/' buildozer.spec
+          
           buildozer -v android debug
         shell: bash
 
