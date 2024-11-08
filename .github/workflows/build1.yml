@@ -37,7 +37,7 @@ jobs:
           pip install cython  # Install Cython
           pip install buildozer
 
-      # Step 4: Set up Android SDK and accept licenses
+      
       - name: Set up Android SDK and accept licenses
         run: |
         
@@ -46,15 +46,15 @@ jobs:
           sudo unzip -q commandlinetools-linux-8512546_latest.zip -d /usr/lib/android-sdk/cmdline-tools
           sudo mv /usr/lib/android-sdk/cmdline-tools/cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest
           
-        
-          echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
-          echo "PATH=/usr/lib/android-sdk/cmdline-tools/latest/bin:/usr/lib/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
+          # Update environment variables in the current shell session
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
           
-        
+          # Print the PATH and verify sdkmanager location
           echo "PATH=$PATH"
           which sdkmanager
 
-        
+          # Accept all SDK licenses automatically
           yes | sdkmanager --licenses
           sdkmanager --update
           sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "cmdline-tools;latest"
