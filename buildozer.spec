@@ -24,6 +24,6 @@ android.update_sdk = True
 android.javac_target = 1.8
 android.accept_sdk_license = True  # Accepts the SDK license automatically
 
-# Additional optional configurations
-# android.build_tools_version = 30.0.3 # Uncomment if specifying build tools manually
-# android.arch = armeabi-v7a,arm64-v8a # Specify architectures if needed
+Additional optional configurations
+android.build_tools_version = 30.0.3 # Uncomment if specifying build tools manually
+android.arch = armeabi-v7a,arm64-v8a # Specify architectures if needed
