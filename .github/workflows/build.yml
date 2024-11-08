@@ -37,7 +37,6 @@ jobs:
       - name: Install Android SDK
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
-          
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           unzip -q commandlinetools-linux-8512546_latest.zip -d $HOME/android-sdk/cmdline-tools
           mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
@@ -59,13 +58,16 @@ jobs:
           export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
           yes | sdkmanager --licenses
           sdkmanager --update
-          sdkmanager "platform-tools" "platforms;android-31" "build-tools;30.0.3"
+          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
       - name: Build the APK
         run: |
           source venv/bin/activate
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+          sed -i 's/android.api = .*/android.api = 30/' buildozer.spec
+          sed -i 's/android.minapi = .*/android.minapi = 21/' buildozer.spec
+          sed -i 's/android.sdk = .*/android.sdk = 30.0.3/' buildozer.spec
           buildozer -v android debug
         shell: bash
 
