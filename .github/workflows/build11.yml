@@ -40,7 +40,7 @@ jobs:
       # Step 4: Set up Android SDK and accept licenses
       - name: Set up Android SDK and accept licenses
         run: |
-          # Download and unzip command-line tools
+        
           sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           sudo unzip -q commandlinetools-linux-8512546_latest.zip -d /usr/lib/android-sdk/cmdline-tools
