@@ -1,0 +1,70 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'  # Adjust as needed
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libffi-dev libssl-dev libzbar-dev \
+                             python3-setuptools python3-pip build-essential \
+                             git zip zlib1g-dev autoconf automake \
+                             libtool pkg-config liblcms2-dev \
+                             libgmp3-dev libmpc-dev libmpfr-dev \
+                             libtiff5-dev libfreetype6-dev \
+                             python3-venv wget unzip
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip Cython
+          pip install buildozer
+
+      - name: Install Android SDK
+        run: |
+          # Set up directories for the Android SDK
+          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
+          
+          # Download and extract the Android command-line tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+          sudo unzip -q commandlinetools-linux-8512546_latest.zip -d /usr/lib/android-sdk/cmdline-tools
+          sudo mv /usr/lib/android-sdk/cmdline-tools/cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest
+          
+          # Set Android SDK environment variables
+          echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$PATH:/usr/lib/android-sdk/cmdline-tools/latest/bin:/usr/lib/android-sdk/platform-tools" >> $GITHUB_ENV
+
+          # Accept Android SDK licenses and install essential components
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+          export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "cmdline-tools;latest"
+
+      - name: Build the APK
+        run: |
+          source venv/bin/activate
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+          export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+          buildozer -v android debug  # Use 'release' for a release APK
+        shell: bash
+
+      - name: Upload APK
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug.apk
+          path: bin
