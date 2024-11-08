@@ -14,13 +14,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Python (you already set version to 3.8)
+      # Step 2: Set up Python (version 3.8)
       - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10.12
+          python-version: 3.8
 
-      # Step 3: Install dependencies
+      # Step 3: Install Buildozer dependencies
       - name: Install Buildozer dependencies
         run: |
           sudo apt update
@@ -34,16 +34,29 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install cython  # Install Cython here
+          pip install cython  # Install Cython
           pip install buildozer
 
-      # Step 4: Build APK with Buildozer (use android debug)
+      # Step 4: Set up Android SDK and accept licenses
+      - name: Set up Android SDK and accept licenses
+        run: |
+          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+          sudo unzip -q commandlinetools-linux-8512546_latest.zip -d /usr/lib/android-sdk/cmdline-tools
+          sudo mv /usr/lib/android-sdk/cmdline-tools/cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest
+          echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$PATH:/usr/lib/android-sdk/cmdline-tools/latest/bin:/usr/lib/android-sdk/platform-tools" >> $GITHUB_ENV
+          yes | sdkmanager --licenses  # Automatically accept licenses
+          sdkmanager --update
+          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "cmdline-tools;latest"
+
+      # Step 5: Build APK with Buildozer
       - name: Build APK with Buildozer
         run: |
           source venv/bin/activate
           buildozer -v android debug
-          
-      # Step 5: Upload APK artifact
+
+      # Step 6: Upload APK artifact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
