@@ -1,20 +1,50 @@
+name: Build APK
+
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Build APK
-        uses: digreatbrian/buildozer-action@v2
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python (you already set version to 3.8)
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
         with:
           python-version: 3.10.12
-          buildozer-cmd: buildozer -v android debug
 
-      - name: Upload artifacts
+      # Step 3: Install dependencies
+      - name: Install Buildozer dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libffi-dev libssl-dev libzbar-dev \
+                             python3-setuptools python3-pip build-essential \
+                             git zip zlib1g-dev autoconf automake \
+                             libtool pkg-config liblcms2-dev \
+                             libgmp3-dev libmpc-dev libmpfr-dev \
+                             libtiff5-dev libfreetype6-dev \
+                             python3-venv wget unzip
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install buildozer
+
+      # Step 4: Build APK with Buildozer (use android debug)
+      - name: Build APK with Buildozer
+        run: |
+          source venv/bin/activate
+          buildozer -v android debug
+          
+      # Step 5: Upload APK artifact
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: package
+          name: app-debug
           path: ./bin/*.apk
