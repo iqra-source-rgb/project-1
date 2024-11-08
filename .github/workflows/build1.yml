@@ -40,13 +40,18 @@ jobs:
       # Step 4: Set up Android SDK and accept licenses
       - name: Set up Android SDK and accept licenses
         run: |
+        
           sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           sudo unzip -q commandlinetools-linux-8512546_latest.zip -d /usr/lib/android-sdk/cmdline-tools
           sudo mv /usr/lib/android-sdk/cmdline-tools/cmdline-tools /usr/lib/android-sdk/cmdline-tools/latest
+          
+        
           echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
           echo "PATH=$PATH:/usr/lib/android-sdk/cmdline-tools/latest/bin:/usr/lib/android-sdk/platform-tools" >> $GITHUB_ENV
-          yes | sdkmanager --licenses  # Automatically accept licenses
+          
+        
+          yes | sdkmanager --licenses
           sdkmanager --update
           sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "cmdline-tools;latest"
 
