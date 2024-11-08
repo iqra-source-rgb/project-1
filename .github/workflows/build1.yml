@@ -34,6 +34,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
+          pip install cython  # Install Cython here
           pip install buildozer
 
       # Step 4: Build APK with Buildozer (use android debug)
