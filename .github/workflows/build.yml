@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10.12'  # Adjust as needed
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
@@ -51,11 +51,13 @@ jobs:
           # Update SDK and accept licenses
           export ANDROID_SDK_ROOT=/usr/lib/android-sdk
           export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
-          sdkmanager --update
-          yes | sdkmanager --licenses  # Accept licenses explicitly
 
-          # Install required SDK components, specifying compatible build tools
-          sdkmanager "platform-tools" "platforms;android-31" "build-tools;30.0.3" "cmdline-tools;latest"  # You may adjust versions as needed
+          # Explicitly accept licenses during install
+          sdkmanager --update
+          yes | sdkmanager --licenses  # Ensure licenses are accepted
+
+          # Install required SDK components, use compatible versions
+          sdkmanager "platform-tools" "platforms;android-31" "build-tools;30.0.3" "cmdline-tools;latest"
 
       - name: Build the APK
         run: |
@@ -71,3 +73,4 @@ jobs:
         with:
           name: app-debug.apk
           path: bin
+
